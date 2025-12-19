@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const controller = require('../controllers/gasDetection');
 
-const { getGas } = require('../controllers/gasDetection');
-
-router.get('/', getGas);
+router.post('/', controller.createReading);
+router.get('/', controller.getAllReadings);
+router.get('/latest', controller.getLatestReading);
 
 module.exports = router;
