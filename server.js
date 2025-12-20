@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const os = require('os');
 
+const connectDB = require('./src/config/db');
+
 const gasRoutes = require('./src/routes/gasDetection');
 const heartRateRoutes = require('./src/routes/heartRate');
 const humanTempRoutes = require('./src/routes/humanTemp');
@@ -42,6 +44,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// Connect to MongoDB
+connectDB();
+
 // Register all routes
 app.use('/api/gas', gasRoutes);
 app.use('/api/heart', heartRateRoutes);
@@ -53,20 +58,21 @@ app.use('/api/control', sensorControlRoutes);
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
-    message: 'ESP32 Sensor API Server',
+    message: 'ESP32 Sensor API Server & Smart Mirror Skin Care API Running 🪞',
     version: '1.0.0',
-    status: 'running',
     uptime: process.uptime(),
     endpoints: {
       gasDetection: '/api/gas',
       heartRate: '/api/heart',
       humanTemp: '/api/human-temp',
       roomTemp: '/api/room-temp',
-      skincare: '/api/skincare',
+      skincareAnalyze: 'POST /api/skincare/analyze',
+      skincareStatus: 'GET /api/skincare/status',
       control: '/api/control'
     }
   });
 });
+
 
 // Error handling
 app.use((err, req, res, next) => {
@@ -121,9 +127,9 @@ function getPreferredIP() {
   return ips[0]?.address || 'localhost';
 }
 
-// ⚡⚡⚡ الإصلاح الرئيسي هنا ⚡⚡⚡
-// بدلاً من app.listen(PORT, '192.168.137.1', ...)
-// نستخدم '0.0.0.0' للاستماع على جميع الـ network interfaces
+// ⚡⚡⚡ Main fix here ⚡⚡⚡
+// Instead of app.listen(PORT, '192.168.137.1', ...)
+// Use '0.0.0.0' to listen on all network interfaces
 app.listen(PORT, '0.0.0.0', () => {  
   const allIPs = getAllIPs();
   const preferredIP = getPreferredIP();

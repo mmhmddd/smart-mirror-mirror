@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const controller = require('../controllers/skincare'); // Fix: lowercase 's'
+const skinCareController = require('../controllers/skinCareController');
 
-router.post('/', controller.createReading);
-router.get('/', controller.getAllReadings);
-router.get('/latest', controller.getLatestReading);
+router.post('/analyze', skinCareController.analyzeSkin);
+router.get('/status', (req, res) => {
+  res.json({ success: true, message: 'Skin Care API is active 🪞' });
+});
 
 module.exports = router;

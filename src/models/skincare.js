@@ -1,46 +1,41 @@
-let skincareData = [];
-const MAX_RECORDS = 1000;
+const mongoose = require('mongoose');
 
-const Skincare = {
-  create: (data) => {
-    const record = {
-      id: Date.now(),
-      skinTemp: data.skinTemp,
-      ambientTemp: data.ambientTemp,
-      humidity: data.humidity,
-      recommendation: data.recommendation || null,
-      timestamp: new Date().toISOString(),
-      deviceId: data.deviceId || 'ESP32-S3-001'
-    };
-    
-    skincareData.unshift(record);
-    if (skincareData.length > MAX_RECORDS) {
-      skincareData = skincareData.slice(0, MAX_RECORDS);
-    }
-    
-    return record;
+const skinCareSchema = new mongoose.Schema({
+  skinType: {
+    type: String,
+    required: true,
+    enum: ['Oily', 'Dry', 'Combination', 'Normal']
   },
-
-  getAll: (limit = 50) => {
-    return skincareData.slice(0, limit);
+  condition: {
+    type: String,
+    required: true,
+    enum: ['Clear', 'Mild Acne', 'Moderate Acne', 'Severe Acne', 'Dryness', 'Redness', 'Aging']
   },
-
-  getLatest: () => {
-    return skincareData[0] || null;
+  morningRoutine: {
+    type: [String],
+    default: []
   },
-
-  getByTimeRange: (startTime, endTime) => {
-    return skincareData.filter(record => {
-      const timestamp = new Date(record.timestamp).getTime();
-      return timestamp >= startTime && timestamp <= endTime;
-    });
+  nightRoutine: {
+    type: [String],
+    default: []
   },
-
-  clear: () => {
-    const count = skincareData.length;
-    skincareData = [];
-    return count;
+  recommendedIngredients: {
+    type: [String],
+    default: []
+  },
+  avoidIngredients: {
+    type: [String],
+    default: []
+  },
+  lifestyleTips: {
+    type: [String],
+    default: []
   }
-};
+}, {
+  timestamps: true
+});
 
-module.exports = Skincare;
+// Index for fast query by skinType + condition
+skinCareSchema.index({ skinType: 1, condition: 1 });
+
+module.exports = mongoose.model('SkinCare', skinCareSchema);
