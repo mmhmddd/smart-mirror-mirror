@@ -4,24 +4,43 @@ const gasDetectionController = {
   // POST /api/gas - Create new gas reading
   createReading: (req, res) => {
     try {
-      const { rawValue, quality, ppm, deviceId } = req.body;
+      const { 
+        rawValue, 
+        voltage,
+        resistance,
+        co2_ppm, 
+        co2_percentage,
+        co2_status,
+        smoke_level,
+        smoke_status,
+        aqi_score,
+        overall_quality,
+        deviceId 
+      } = req.body;
 
       // Validate required fields
-      if (rawValue === undefined || !quality) {
+      if (rawValue === undefined) {
         return res.status(400).json({
           success: false,
-          message: 'rawValue and quality are required'
+          message: 'rawValue is required'
         });
       }
 
       const reading = GasDetection.create({
         rawValue,
-        quality,
-        ppm,
+        voltage,
+        resistance,
+        co2_ppm,
+        co2_percentage,
+        co2_status,
+        smoke_level,
+        smoke_status,
+        aqi_score,
+        overall_quality,
         deviceId
       });
 
-      console.log(`✓ Gas reading saved: ${rawValue} (${quality})`);
+      console.log(`✓ Gas reading saved: CO₂=${co2_ppm}ppm, Smoke=${smoke_level}%, AQI=${aqi_score} (${overall_quality})`);
 
       res.status(201).json({
         success: true,
